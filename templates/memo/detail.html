@@ -2,19 +2,18 @@
 
 {% block content %}
 
-<div>
+<div class="my-5">
     <a href="{% url 'memo:index' %}">ホームに戻る</a>
 </div>
   
-<h2>{{ memo.title }}</h2>
-<div>
+<h2 class="my-3">{{ memo.title }}</h2>
+<div class="my-3">
     {{ memo.text | linebreaks | urlize }}
 </div>
 
-<button><a class="btn" href="{% url 'memo:edit_memo' memo.slug %}">編集</a></button>
-
 <form method="post" action="{% url 'memo:delete_memo' memo.slug %}">
     {% csrf_token %}
+    <a class="btn" href="{% url 'memo:edit_memo' memo.slug %}">編集</a>
     <button class="btn" type="submit" onclick='return confirm("本当に削除しますか？");'>削除</button>
 </form>
 
