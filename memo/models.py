@@ -15,5 +15,8 @@ class Memo(models.Model):
     created_datetime = models.DateTimeField('作成日時', auto_now_add=True)
     updated_datetime = models.DateTimeField('更新日時', auto_now=True)
 
+    class Meta:
+        ordering = ('-created_datetime',)
+
     def __str__(self):
         return self.title

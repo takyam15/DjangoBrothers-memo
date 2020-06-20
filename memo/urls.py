@@ -1,4 +1,4 @@
-"""config URL Configuration
+"""memo URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.2/topics/http/urls/
@@ -13,17 +13,18 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf import settings
-from django.conf.urls.static import static
-from django.contrib import admin
-from django.urls import include, path
+from django.urls import path
+
+from .views import (
+    MemoList, MemoDetail, MemoCreate, MemoDelete, MemoUpdate,
+)
 
 
+app_name = 'memo'
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('memo.urls')),
+    path('', MemoList.as_view(), name='index'),
+    path('new_memo', MemoCreate.as_view(), name='new_memo'),
+    path('<slug:slug>', MemoDetail.as_view(), name='detail'),
+    path('delete/<slug:slug>', MemoDelete.as_view(), name='delete_memo'),
+    path('edit/<slug:slug>', MemoUpdate.as_view(), name='edit_memo'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
