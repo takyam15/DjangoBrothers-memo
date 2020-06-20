@@ -2,27 +2,41 @@
 
 {% block content %}
 
-<div>
+<div class="my-5">
     <a href="{% url 'memo:detail' memo.slug %}">戻る</a>
 </div>
 
 <form action="{% url 'memo:edit_memo' memo.slug %}" method="POST">
     {% csrf_token %}
-    <table>
+
+    {% if form.non_field_errors %}
+    <div class="error-list text-danger font-weight-bold">
+    {% for error in form.non_field_errors %}
+        {{ error }}<br>
+    {% endfor %}
+    </div>
+    {% endif %}
+
+    <table  class="table table-borderless my-3">
+        {% for field in form %}
         <tr>
-            <th>タイトル</th>
-            <td>{{ form.title }}</td>
+            <th>{{ field.label }}</th>
+            <td>
+                {{ field }}
+                {% if field.errors %}
+                <div class="error-list text-danger font-weight-bold">
+                    {% for error in field.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </td>
         </tr>
-        <tr>
-            <th>スラッグ</th>
-            <td>{{ form.slug }}</td>
-        </tr>
-        <tr>
-            <th>テキスト</th>
-            <td>{{ form.text }}</td>
-        </tr>
+        {% endfor %}
     </table>
+
     <button class="btn" type="submit">保存</button>
+
 </form>
 
 {% endblock content %}

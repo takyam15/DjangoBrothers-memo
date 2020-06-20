@@ -2,14 +2,37 @@
 
 {% block content %}
 
-<div>
+<div class="my-5">
     <a href="{% url 'memo:index' %}">ホームに戻る</a>
 </div>
 
 <form action="{% url 'memo:new_memo' %}" method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
+
+    {% if form.non_field_errors %}
+    <div class="error-list text-danger font-weight-bold">
+    {% for error in search_form.non_field_errors %}
+        {{ error }}<br>
+    {% endfor %}
+    </div>
+    {% endif %}
+
+    {% for field in form %}
+    <div class="form-group">
+    {{ field.label_tag }}
+    {{ field }}
+    {% if field.errors %}
+    <div class="error-list text-danger font-weight-bold">
+        {% for error in field.errors %}
+            {{ error }}<br>
+        {% endfor %}
+    </div>
+    {% endif %}
+    </div>
+    {% endfor %}
+
     <button type="submit" class="btn">保存</button>
+
 </form>
 
 {% endblock content %}
