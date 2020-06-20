@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+{% load static %}
+
+
+
+    <head>
+
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+    <title>DjangoBrosMemo</title>
+
+    {% bootstrap_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'memo/css/style.css' %}">
+
+
+    </head>
+
+
+
+    <body>
+
+
+    <h1>DjangoBrosMemo</h1>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    {% bootstrap_javascript jquery='full' %}
+
+
+    </body>
+
+
+
+</html>

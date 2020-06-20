@@ -5,5 +5,5 @@ from .models import Memo
 
 class MemoForm(ModelForm):
     class Meta:
-        model = models.Memo
+        model = Memo
         fields = ['title', 'slug', 'text']
