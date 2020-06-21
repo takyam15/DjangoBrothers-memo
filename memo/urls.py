@@ -23,7 +23,7 @@ app_name = 'memo'
 urlpatterns = [
     path('', MemoList.as_view(), name='index'),
     path('new_memo', MemoCreate.as_view(), name='new_memo'),
-    path('<slug:slug>', MemoDetail.as_view(), name='detail'),
+    path('detail/<slug:slug>', MemoDetail.as_view(), name='detail'),
     path('delete/<slug:slug>', MemoDelete.as_view(), name='delete_memo'),
     path('edit/<slug:slug>', MemoUpdate.as_view(), name='edit_memo'),
 ]
