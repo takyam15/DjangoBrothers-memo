@@ -19,7 +19,6 @@ from .views import (
     MemoList, MemoDetail, MemoCreate, MemoDelete, MemoUpdate,
 )
 
-
 app_name = 'memo'
 urlpatterns = [
     path('', MemoList.as_view(), name='index'),
