@@ -1,3 +1,4 @@
+from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
 from django.views.generic import (
     ListView, DetailView, CreateView, DeleteView, UpdateView,
@@ -36,4 +37,6 @@ class MemoUpdate(UpdateView):
     model = Memo
     form_class = MemoForm
     template_name = 'memo/edit.html'
-    success_url = reverse_lazy('memo:index')
+    
+    def get_success_url(self):
+        return resolve_url('memo:detail', slug=self.kwargs['slug'])
