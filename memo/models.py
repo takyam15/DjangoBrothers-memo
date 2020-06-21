@@ -10,7 +10,7 @@ class Author(AbstractUser):
 
 class Memo(models.Model):
     title = models.CharField('タイトル', max_length=150)
-    slug = models.SlugField('スラッグ')
+    slug = models.SlugField('スラッグ', unique=True)
     text = models.TextField('本文', blank=True)
     created_datetime = models.DateTimeField('作成日時', auto_now_add=True)
     updated_datetime = models.DateTimeField('更新日時', auto_now=True)
