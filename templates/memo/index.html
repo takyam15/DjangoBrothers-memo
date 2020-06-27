@@ -2,6 +2,34 @@
 
 {% block content %}
 
+<form action="" class="form-inline my-2 my-lg-0 float-right">
+
+  {% if search_form.non_field_errors %}
+  <div class="error-list text-danger font-weight-bold">
+    {% for error in search_form.non_field_errors %}
+      {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% for field in search_form %}
+  <div class="form-group">
+    {{ field.label_tag }}
+    {{ field }}
+    {% if field.errors %}
+    <div class="error-list text-danger font-weight-bold">
+      {% for error in field.errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <button type="submit" class="btn btn-outline-primary my-2 my-sm-0">検索</button>
+
+</form>
+
 <div class="my-5">
   <a class="btn" href="{% url 'memo:new_memo' %}">新規メモ作成</a>
 </div>
@@ -16,5 +44,7 @@
 {% empty %}
 <p>表示するメモがありません。</p>
 {% endfor %}
+
+{% include 'memo/includes/paginator.html' %}
 
 {% endblock content %}

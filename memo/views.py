@@ -4,7 +4,7 @@ from django.views.generic import (
     ListView, DetailView, CreateView, DeleteView, UpdateView,
 )
 
-from .forms import MemoForm
+from .forms import MemoForm, MemoSearchForm
 from .models import Memo
 
 
@@ -13,6 +13,18 @@ from .models import Memo
 class MemoList(ListView):
     model = Memo
     template_name = 'memo/index.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        form = MemoSearchForm(self.request.GET)
+        queryset = super().get_queryset()
+        queryset = form.filter_memos(queryset)
+        return queryset
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['search_form'] = MemoSearchForm(self.request.GET)
+        return context
 
 
 class MemoDetail(DetailView):
