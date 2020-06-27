@@ -56,7 +56,7 @@ class MemoDetailTests(TestCase):
     def test_get(self):
         memo = MemoFactory(title='Example memo', slug='memo')
         res = self.client.get(reverse('memo:detail', kwargs={'slug': 'memo'}))
-        self.assertTemplateUsed()
+        self.assertTemplateUsed(res, 'memo/detail.html')
         self.assertEqual(res.context['memo'].title, 'Example memo')
 
     def test_404(self):
