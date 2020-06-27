@@ -13,6 +13,8 @@
     <span class="updated_datetime">{{ memo.updated_datetime }}</span>
   </div>
 </a>
+{% empty %}
+<p>表示するメモがありません。</p>
 {% endfor %}
 
 {% endblock content %}
