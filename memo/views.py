@@ -3,10 +3,15 @@ from django.urls import reverse_lazy
 from django.views.generic import (
     ListView, DetailView, CreateView, DeleteView, UpdateView,
 )
+from rest_framework.generics import (
+    ListAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView,
+)
 
 from .forms import MemoForm, MemoSearchForm
 from .models import Memo
-
+from .serializers import (
+    MemoListSerializer, MemoRetrieveSerializer, MemoCreateSerializer, MemoUpdateSerializer, MemoDestroySerializer,
+)
 
 # Create your views here.
 
@@ -52,3 +57,29 @@ class MemoUpdate(UpdateView):
     
     def get_success_url(self):
         return resolve_url('memo:detail', slug=self.kwargs['slug'])
+
+
+class MemoListAPI(ListAPIView):
+    queryset = Memo.objects.all()
+    serializer_class = MemoListSerializer
+
+
+class MemoRetirieveAPI(RetrieveAPIView):
+    queryset = Memo.objects.all()
+    serializer_class = MemoRetrieveSerializer
+    lookup_field = 'slug'
+
+
+class MemoCreateAPI(CreateAPIView):
+    queryset = Memo.objects.all()
+    serializer_class = MemoCreateSerializer
+
+
+class MemoUpdateAPI(UpdateAPIView):
+    queryset = Memo.objects.all()
+    serializer_class = MemoUpdateSerializer
+
+
+class MemoDestroyAPI(DestroyAPIView):
+    queryset = Memo.objects.all()
+    serializer_class = MemoDestroySerializer
