@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path
 
 from .views import (
-    MemoList, MemoDetail, MemoCreate, MemoDelete, MemoUpdate,
+    MemoList, MemoDetail, MemoCreate, MemoDelete, MemoUpdate, MemoListAPI, MemoRetirieveAPI, MemoCreateAPI, MemoUpdateAPI, MemoDestroyAPI,
 )
 
 app_name = 'memo'
@@ -26,4 +26,9 @@ urlpatterns = [
     path('detail/<slug:slug>', MemoDetail.as_view(), name='detail'),
     path('delete/<slug:slug>', MemoDelete.as_view(), name='delete_memo'),
     path('edit/<slug:slug>', MemoUpdate.as_view(), name='edit_memo'),
+    path('api/memos/', MemoListAPI.as_view(), name='api_list'),
+    path('api/memos/<slug:slug>/', MemoRetirieveAPI.as_view(), name='api_retrieve'),
+    path('api/memos/new/', MemoCreateAPI.as_view(), name='api_create'),
+    path('api/memos/edit/<slug:slug>/', MemoUpdateAPI.as_view(), name='api_update'),
+    path('api/memos/delete/<slug:slug>/', MemoDestroyAPI.as_view(), name='api_delete'),
 ]
