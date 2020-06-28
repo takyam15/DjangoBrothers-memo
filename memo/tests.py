@@ -178,7 +178,7 @@ class MemoUpdateTests(TestCase):
         memo = MemoFactory(title='Example', slug='example', text='This is an example text.')
         updated_memo = {'title': 'Example', 'slug': 'example', 'text': 'This text is updated.'}
         res = self.client.post(reverse('memo:edit_memo', kwargs={'slug': 'example'}), data=updated_memo)
-        self.assertRedirects(res, reverse('memo:detail', kwargs={'slug': 'example'}))
+        self.assertRedirects(res, reverse('memo:index'))
         memo.refresh_from_db()
         self.assertEqual(memo.text, 'This text is updated.')
 

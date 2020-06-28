@@ -54,9 +54,7 @@ class MemoUpdate(UpdateView):
     model = Memo
     form_class = MemoForm
     template_name = 'memo/edit.html'
-    
-    def get_success_url(self):
-        return resolve_url('memo:detail', slug=self.kwargs['slug'])
+    success_url = reverse_lazy('memo:index')
 
 
 class MemoListAPI(ListAPIView):
