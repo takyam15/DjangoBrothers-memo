@@ -21,6 +21,43 @@ class MemoFactory(factory.django.DjangoModelFactory):
         model = Memo
 
 
+# Tests for the forms
+
+class MemoSearchFormTests(TestCase):
+    def test_filter_memos(self):
+        memo_1 = MemoFactory(
+            title='First memo', slug='first-memo', text='This memo is opened.'
+        )
+        memo_2 = MemoFactory(
+            title='Second memo', slug='second-memo', text='This is the second memo.'
+        )
+        memo_3 = MemoFactory(
+            title='Third memo', slug='third-memo', text='This is not the first memo.'
+        )
+        memo_4 = MemoFactory(
+            title='Dummy first memo', slug='forth-memo', text='This is the forth memo.'
+        )
+        memo_5 = MemoFactory(
+            title='Draft memo', slug='fifth-memo', text='The First memo has been withdrawn.'
+        )
+        form = MemoSearchForm({'keyword': 'first'})
+        memos = form.filter_memos(Memo.objects.all())
+        self.assertEqual(Memo.objects.count(), 5)
+        self.assertEqual(len(memos), 4)
+        self.assertEqual(memos[0].text, 'The First memo has been withdrawn.')
+        self.assertEqual(memos[1].title, 'Dummy first memo')
+        self.assertEqual(memos[2].text, 'This is not the first memo.')
+        self.assertEqual(memos[3].title, 'First memo')
+
+    def test_not_filter_memos(self):
+        memo_1 = MemoFactory(slug='first-memo')
+        memo_2 = MemoFactory(slug='second-memo')
+        form = MemoSearchForm({'keyword': ''})
+        memos = form.filter_memos(Memo.objects.all())
+        self.assertEqual(Memo.objects.count(), 2)
+        self.assertEqual(len(memos), 2)
+
+
 # Tests for the views
 
 class MemoListTests(TestCase):
@@ -51,6 +88,37 @@ class MemoListTests(TestCase):
             res.context['memo_list'],
             []
         )
+
+    def get_paginate(self):
+        memo_1 = MemoFactory(slug='memo-1')
+        memo_2 = MemoFactory(slug='memo-2')
+        memo_3 = MemoFactory(slug='memo-3')
+        memo_4 = MemoFactory(slug='memo-4')
+        memo_5 = MemoFactory(slug='memo-5')
+        memo_6 = MemoFactory(slug='memo-6')
+        memo_7 = MemoFactory(slug='memo-7')
+        memo_8 = MemoFactory(slug='memo-8')
+        memo_9 = MemoFactory(slug='memo-9')
+        memo_10 = MemoFactory(slug='memo-10')
+        memo_11 = MemoFactory(slug='memo-11')
+        res_1 = self.client.get(reverse('memo:index'), data={'page': 1})
+        res_2 = self.client.get(reverse('memo:index'), data={'page': 2})
+        self.assertTemplateUsed(res_1, 'memo/index.html')
+        self.assertTemplateUsed(res_2, 'memo/index.html')
+        self.assertEqual(Memo.objects.count(), 11)
+        self.assertContains(res_1, 'memo-11')
+        self.assertContains(res_1, 'memo-2')
+        self.assertContains(res_2, 'memo-1')
+
+    def get_invalid_page_number(self):
+        memo = MemoFactory()
+        res = self.client.get(reverse('memo:index'), data={'page': 2})
+        self.assertEqual(res.status_code, 404)
+
+    def get_invalid_page_name(self):
+        memo = Memofactory()
+        res = self.client.get(reverse('memo:index'), data={'page': 'invalid'})
+        self.assertEqual(res.status_code, 404)
 
 
 class MemoDetailTests(TestCase):
