@@ -78,8 +78,10 @@ class MemoCreateAPI(CreateAPIView):
 class MemoUpdateAPI(UpdateAPIView):
     queryset = Memo.objects.all()
     serializer_class = MemoUpdateSerializer
+    lookup_field = 'slug'
 
 
 class MemoDestroyAPI(DestroyAPIView):
     queryset = Memo.objects.all()
     serializer_class = MemoDestroySerializer
+    lookup_field = 'slug'
