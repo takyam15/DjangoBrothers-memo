@@ -210,7 +210,7 @@ class MemoRetrieveAPITests(APITestCase):
 
     def test_get_404_api(self):
         res = self.client.get(reverse('memo:api_retrieve', kwargs={'slug': 'sample-memo'}), format='json')
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class MemoCreateAPITests(APITestCase):
