@@ -2,6 +2,8 @@ import factory
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from .forms import MemoSearchForm
 from .models import Memo
@@ -123,8 +125,8 @@ class MemoListTests(TestCase):
 
 class MemoDetailTests(TestCase):
     def test_get(self):
-        memo = MemoFactory(title='Example memo', slug='memo')
-        res = self.client.get(reverse('memo:detail', kwargs={'slug': 'memo'}))
+        memo = MemoFactory(title='Example memo', slug='example-memo')
+        res = self.client.get(reverse('memo:detail', kwargs={'slug': 'example-memo'}))
         self.assertTemplateUsed(res, 'memo/detail.html')
         self.assertEqual(res.context['memo'].title, 'Example memo')
 
@@ -139,39 +141,42 @@ class MemoCreateTests(TestCase):
         self.assertTemplateUsed('memo/new.html')
 
     def test_post(self):
-        new_memo = {'title': 'Example', 'slug': 'example', 'text': 'This is an example text.'}
+        new_memo = {
+            'title': 'New memo',
+            'slug': 'new-memo',
+            'text': 'This is a new memo.'
+        }
         res = self.client.post(reverse('memo:new_memo'), data=new_memo)
         self.assertRedirects(res, reverse('memo:index'))
         self.assertEqual(Memo.objects.count(), 1)
 
     def test_empty_post(self):
-        new_memo = {'title': 'Example', 'slug': 'example', 'text': ''}
+        new_memo = {'title': 'Example memo', 'slug': 'example-memo', 'text': ''}
         res = self.client.post(reverse('memo:new_memo'), data=new_memo)
         self.assertEqual(Memo.objects.count(), 0)
 
 
 class MemoDeleteTests(TestCase):
     def test_get(self):
-        memo = MemoFactory(slug='example')
-        res = self.client.get(reverse('memo:delete_memo', kwargs={'slug': 'example'}))
+        memo = MemoFactory(slug='example-memo')
+        res = self.client.get(reverse('memo:delete_memo', kwargs={'slug': 'example-memo'}))
         self.assertTemplateUsed(res, 'memo/delete.html')
 
     def test_post(self):
-        memo = MemoFactory(slug='example')
-        res = self.client.post(reverse('memo:delete_memo', kwargs={'slug': 'example'}))
+        memo = MemoFactory(slug='example-memo')
+        res = self.client.post(reverse('memo:delete_memo', kwargs={'slug': 'example-memo'}))
         self.assertRedirects(res, reverse('memo:index'))
         self.assertEqual(Memo.objects.count(), 0)
 
     def test_post_404(self):
-        memo = MemoFactory(slug='example')
-        res = self.client.post(reverse('memo:delete_memo', kwargs={'slug': 'sample'}))
+        res = self.client.post(reverse('memo:delete_memo', kwargs={'slug': 'sample-memo'}))
         self.assertEqual(res.status_code, 404)
 
 
 class MemoUpdateTests(TestCase):
     def test_get(self):
-        memo = MemoFactory(slug='example')
-        res = self.client.get(reverse('memo:edit_memo', kwargs={'slug': 'example'}))
+        memo = MemoFactory(slug='example-memo')
+        res = self.client.get(reverse('memo:edit_memo', kwargs={'slug': 'example-memo'}))
         self.assertTemplateUsed(res, 'memo/edit.html')
 
     def test_post(self):
@@ -180,9 +185,76 @@ class MemoUpdateTests(TestCase):
         res = self.client.post(reverse('memo:edit_memo', kwargs={'slug': 'example'}), data=updated_memo)
         self.assertRedirects(res, reverse('memo:index'))
         memo.refresh_from_db()
+        self.assertEqual(Memo.objects.count(), 1)
         self.assertEqual(memo.text, 'This text is updated.')
 
     def test_post_404(self):
-        memo = MemoFactory(title='Example', slug='example', text='This is an example text.')
         res = self.client.post(reverse('memo:edit_memo', kwargs={'slug': 'sample'}))
         self.assertEqual(res.status_code, 404)
+
+
+class MemoListAPITests(APITestCase):
+    def test_get_memos_api(self):
+        memo_1 = MemoFactory(title='first memo', slug='first-memo')
+        memo_2 = MemoFactory(title='second-memo', slug='second-memo')
+        res = self.client.get(reverse('memo:api_list'), format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(Memo.objects.count(), 2)
+
+
+class MemoRetrieveAPITests(APITestCase):
+    def test_get_memo_api(self):
+        memo = MemoFactory(title='Example memo', slug='example-memo')
+        res = self.client.get(reverse('memo:api_retrieve', kwargs={'slug': 'example-memo'}), format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_get_404(self):
+        res = self.client.get(reverse('memo:api_retrieve', kwargs={'slug': 'sample-memo'}), format='json')
+        self.assertEqual(res.status_code, 404)
+
+
+class MemoCreateAPITests(APITestCase):
+    def test_post(self):
+        new_memo = {
+            'title': 'New memo',
+            'slug': 'new-memo',
+            'text': 'This is a new memo.'
+        }
+        res = self.client.post(reverse('memo:api_create'), data=new_memo)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Memo.objects.count(), 1)
+
+    def test_post_invalid(self):
+        pass
+
+
+class MemoUpdateAPITests(APITestCase):
+    def test_put(self):
+        memo = MemoFactory(title='Example memo', slug='example-memo', text='This is an example memo.')
+        updated_memo = {'title': 'Example memo', 'slug': 'example', 'text': 'This text is updated.'}
+        res = self.client.put(reverse('memo:api_update', kwargs={'slug': 'example-memo'}), data=updated_memo)
+        memo.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(Memo.objects.count(), 1)
+        self.assertEqual(memo.text, 'This text is updated.')
+
+    def test_put_invalid(self):
+        memo = MemoFactory(title='Example memo', slug='example-memo', text='This is an example memo.')
+        updated_memo = {'title': '', 'slug': 'example-memo', 'text': 'This text is updated.'}
+        res = self.client.put(reverse('memo:api_update', kwargs={'slug': 'example-memo'}), data=updated_memo)
+        memo.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Memo.objects.count(), 1)
+        self.assertEqual(memo.text, 'This is an example memo.')
+
+
+class MemoDestroyAPITests(APITestCase):
+    def test_delete(self):
+        memo = MemoFactory(title='Example', slug='example-memo', text='This is an example text.')
+        res = self.client.delete(reverse('memo:api_delete', kwargs={'slug': 'example-memo'}))
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Memo.objects.count(), 0)
+
+    def test_delete_invalid(self):
+        res = self.client.delete(reverse('memo:api_delete', kwargs={'slug': 'sample-memo'}))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
