@@ -85,25 +85,74 @@ class MemoListTests(TestCase):
         )
 
     def get_paginate(self):
-        memo_1 = MemoFactory(slug='memo-1')
-        memo_2 = MemoFactory(slug='memo-2')
-        memo_3 = MemoFactory(slug='memo-3')
-        memo_4 = MemoFactory(slug='memo-4')
-        memo_5 = MemoFactory(slug='memo-5')
-        memo_6 = MemoFactory(slug='memo-6')
-        memo_7 = MemoFactory(slug='memo-7')
-        memo_8 = MemoFactory(slug='memo-8')
-        memo_9 = MemoFactory(slug='memo-9')
-        memo_10 = MemoFactory(slug='memo-10')
-        memo_11 = MemoFactory(slug='memo-11')
-        res_1 = self.client.get(reverse('memo:index'), data={'page': 1})
-        res_2 = self.client.get(reverse('memo:index'), data={'page': 2})
-        self.assertTemplateUsed(res_1, 'memo/index.html')
-        self.assertTemplateUsed(res_2, 'memo/index.html')
+        memo_1 = MemoFactory(
+            title='Memo 1',
+            slug='memo-1'
+        )
+        memo_2 = MemoFactory(
+            title='Memo 2',
+            slug='memo-2'
+        )
+        memo_3 = MemoFactory(
+            title='Memo 3',
+            slug='memo-3'
+        )
+        memo_4 = MemoFactory(
+            title='Memo 4',
+            slug='memo-4'
+        )
+        memo_5 = MemoFactory(
+            title='Memo 5',
+            slug='memo-5'
+        )
+        memo_6 = MemoFactory(
+            title='Memo 6',
+            slug='memo-6'
+        )
+        memo_7 = MemoFactory(
+            title='Memo 7',
+            slug='memo-7'
+        )
+        memo_8 = MemoFactory(
+            title='Memo 8',
+            slug='memo-8'
+        )
+        memo_9 = MemoFactory(
+            title='Memo 9',
+            slug='memo-9'
+        )
+        memo_10 = MemoFactory(
+            title='Memo 10',
+            slug='memo-10'
+        )
+        memo_11 = MemoFactory(
+            title='Memo 11',
+            slug='memo-11'
+        )
+        res_page_1 = self.client.get(reverse('memo:index'), data={'page': 1})
+        res_page_2 = self.client.get(reverse('memo:index'), data={'page': 2})
+        self.assertTemplateUsed(res_page_1, 'memo/index.html')
+        self.assertTemplateUsed(res_page_2, 'memo/index.html')
         self.assertEqual(Memo.objects.count(), 11)
-        self.assertContains(res_1, 'memo-11')
-        self.assertContains(res_1, 'memo-2')
-        self.assertContains(res_2, 'memo-1')
+        self.assertQuerysetEqual(
+            res_page_1.context['memo_list'],
+            [
+                '<Memo: Memo 11>',
+                '<Memo: Memo 10>',
+                '<Memo: Memo 9>',
+                '<Memo: Memo 8>',
+                '<Memo: Memo 7>',
+                '<Memo: Memo 6>',
+                '<Memo: Memo 5>',
+                '<Memo: Memo 4>',
+                '<Memo: Memo 3>',
+                '<Memo: Memo 2>',
+            ]
+        )
+        self.assertQuerysetEqual(
+            res_page_2.context['memo_list'],
+            ['<Memo: Memo 1>']
+        )
 
     def get_non_existent_page_number(self):
         memo = MemoFactory()
